@@ -4,6 +4,22 @@
 
 # [ *Project-3* ] <*Infrastructure configuration & Security enhancements*>
 
+## 0. 기본 설정 (Default settings)
+### < *Configuration* >
+- [ server ]
+```vim
+ls -las /etc/update-motd.d/
+chmod -x /etc/update-motd.d/10-help-text
+chmod -x /etc/update-motd.d/50-motd-news
+chmod -x /etc/update-motd.d/90-updates-available
+chmod -x /etc/update-motd.d/91-release-upgrade
+chmod -x /etc/update-motd.d/92-unattended-upgrades
+```
+- [ server ]
+>```vim
+>
+>```
+
 ## 1. IPv6 프로토콜 제거 (Disable IPv6 protocol)
 ### < *Configuration* >
 ```vim
