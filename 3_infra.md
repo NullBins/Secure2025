@@ -74,7 +74,7 @@ vim /etc/hosts
 timedatectl set-timezone Asia/Seoul
 ```
 
-## 2. 호스트명 변경 및 IP 설정 (Change the hostname & IPv4 Address settings)
+## 1. 호스트명 변경 및 IP 설정 (Change the hostname & IPv4 Address settings)
 ### < *Configuration* >
 * Hostname (All hosts)
 ```vim
