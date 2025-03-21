@@ -62,6 +62,7 @@ vim /etc/ssh/sshd_config
 >```
 ```vim
 systemctl restart ssh
+systemctl enable ssh
 ```
 ```vim
 hostnamectl set-hostname secure
