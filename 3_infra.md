@@ -14,33 +14,64 @@ chmod -x /etc/update-motd.d/50-motd-news
 chmod -x /etc/update-motd.d/90-updates-available
 chmod -x /etc/update-motd.d/91-release-upgrade
 chmod -x /etc/update-motd.d/92-unattended-upgrades
+systemctl disable systemd-networkd-wait-online.service
+systemctl unmask systemd-networkd-wait-online.service
 ```
-- [ server ]
+```vim
+vim /etc/vim/vimrc
+```
 >```vim
->
+>set number
+>set ignorecase
 >```
-
-## 1. IPv6 프로토콜 제거 (Disable IPv6 protocol)
-### < *Configuration* >
 ```vim
 vim /etc/sysctl.conf
 ```
-- [ All hosts ]
 >```vim
+>net.ipv4.ip_forward=1
 >net.ipv6.conf.all.disable_ipv6 = 1  
 >net.ipv6.conf.default.disable_ipv6 = 1  
 >net.ipv6.conf.lo.disable_ipv6 = 1
 >```
-- [ fw01 ]
+```vim
+vim /etc/issue
+```
 >```vim
->net.ipv4.ip_forward = 1  
+>
+>Welcome to Cyber Security 2025 (Ubuntu Linux 24.04)
+>
 >```
 ```vim
-sysctl -p
+mv /etc/netplan/50-cloud-init.yaml /etc/netplan/config.yaml
+vim /etc/netplan/config.yaml
 ```
-### < *Checking* >
+>```yaml
+>networks:
+>  ethernets:
+>    ens33:
+>      dhcp4: false
+>  version: 2
+>```
 ```vim
-ip -6 addr show | grep "inet6"
+vim /etc/ssh/sshd_config
+```
+>```vim
+>Port 22
+>PermitRootLogin yes
+>Banner /etc/issue
+>```
+```vim
+systemctl restart ssh
+```
+```vim
+hostnamectl set-hostname secure
+vim /etc/hosts
+```
+>```vim
+>127.0.1.1 secure secure
+>```
+```vim
+timedatectl set-timezone Asia/Seoul
 ```
 
 ## 2. 호스트명 변경 및 IP 설정 (Change the hostname & IPv4 Address settings)
