@@ -75,41 +75,43 @@ vim /etc/hosts
 timedatectl set-timezone Asia/Seoul
 ```
 
-## 1. 호스트명 변경 및 IP 설정 (Change the hostname & IPv4 Address settings)
+## 1. VLAN 설정 (VLAN settings)
 ### < *Configuration* >
-* Hostname (All hosts)
+- [ fw ]
 ```vim
-hostnamectl set-hostname <Hostname to change>
-cat /etc/hostname
-sed -i "s/<Original hostname>/<Hostname to change>/g" /etc/hosts
+modprobe 8021q
+echo "8021q" | tee -a /etc/modules
 ```
-* IPv4 Address (All hosts)
-```bash
-mv /etc/netplan/*.yaml /etc/netplan/config.yaml   ### 채점기준에 요구되는 파일명으로 변경
-ip link show   ### 인터페이스 확인 (ens33 ~ 4 . . . | VMware)
-```
+* Network Configuration
 ```vim
 vim /etc/netplan/config.yaml
 ```
->```yaml
->networks:
+>```vim
+>network:
 >  ethernets:
->    ens33:
->      addresses: [10.10.10.10/24]
->      routes:
->        - to: default
->          via: 10.10.10.1
->      nameservers:
->        addresses: [10.10.10.12]
+>    eth1:
 >      dhcp4: false
+>    eth2:
+>      addresses: [10.30.30.6/29]
+>      dhcp4: false
+>    eth3:
+>      dhcp4: true
+>  vlans:
+>    vlan10:
+>      id: 10
+>      link: eth1
+>      addresses: [192.168.70.1/25]
+>    vlan20:
+>      id: 20
+>      link: eth1
+>      addresses: [192.168.70.254/25]
 >  version: 2
+>  renderer: networkd
 >```
-```bash
-netplan apply
-```
-### < *Checking* >
 ```vim
-hostname
-ip -4 addr show | grep "global"
-route -n4 | grep "G"
+cat /sys/class/net/vlan*/ifindex >> /etc/udev/rules.d/70.rules
+vim /etc/udev/rules.d/70.rules
 ```
+>```vim
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME=""
+>```
