@@ -109,10 +109,51 @@ vim /etc/netplan/config.yaml
 >  renderer: networkd
 >```
 ```vim
+ip link show | grep "link/ether" >> /etc/udev/rules.d/70.rules
 cat /sys/class/net/vlan*/ifindex >> /etc/udev/rules.d/70.rules
 vim /etc/udev/rules.d/70.rules
 ```
 >```vim
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(macaddress)",NAME="eth"
 >ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.10"
 >ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.20"
+>```
+- [ isp ]
+```vim
+modprobe 8021q
+echo "8021q" | tee -a /etc/modules
+```
+* Network Configuration
+```vim
+vim /etc/netplan/config.yaml
+```
+>```yaml
+>network:
+>  ethernets:
+>    eth1:
+>      dhcp4: false
+>    eth2:
+>      addresses: [200.10.10.14/28]
+>      dhcp4: false
+>  vlans:
+>    vlan.40:
+>      id: 40
+>      link: eth1
+>      addresses: [180.20.10.1/28]
+>    vlan.50:
+>      id: 50
+>      link: eth1
+>      addresses: [180.20.10.65/28]
+>  version: 2
+>  renderer: networkd
+>```
+```vim
+ip link show | grep "link/ether" >> /etc/udev/rules.d/70.rules
+cat /sys/class/net/vlan*/ifindex >> /etc/udev/rules.d/70.rules
+vim /etc/udev/rules.d/70.rules
+```
+>```vim
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(macaddress)",NAME="eth"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.40"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.50"
 >```
