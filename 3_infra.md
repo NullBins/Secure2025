@@ -86,7 +86,7 @@ echo "8021q" | tee -a /etc/modules
 ```vim
 vim /etc/netplan/config.yaml
 ```
->```vim
+>```yaml
 >network:
 >  ethernets:
 >    eth1:
