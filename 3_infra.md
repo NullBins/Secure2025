@@ -113,5 +113,6 @@ cat /sys/class/net/vlan*/ifindex >> /etc/udev/rules.d/70.rules
 vim /etc/udev/rules.d/70.rules
 ```
 >```vim
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME=""
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.10"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.20"
 >```
