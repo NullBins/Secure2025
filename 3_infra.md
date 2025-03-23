@@ -97,11 +97,11 @@ vim /etc/netplan/config.yaml
 >    eth3:
 >      dhcp4: true
 >  vlans:
->    vlan10:
+>    vlan.10:
 >      id: 10
 >      link: eth1
 >      addresses: [192.168.70.1/25]
->    vlan20:
+>    vlan.20:
 >      id: 20
 >      link: eth1
 >      addresses: [192.168.70.254/25]
