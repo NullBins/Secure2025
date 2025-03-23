@@ -15,7 +15,7 @@ chmod -x /etc/update-motd.d/90-updates-available
 chmod -x /etc/update-motd.d/91-release-upgrade
 chmod -x /etc/update-motd.d/92-unattended-upgrades
 systemctl disable systemd-networkd-wait-online.service
-systemctl unmask systemd-networkd-wait-online.service
+systemctl mask systemd-networkd-wait-online.service
 ```
 ```vim
 vim /etc/vim/vimrc
@@ -38,7 +38,7 @@ vim /etc/issue
 ```
 >```vim
 >
->Welcome to Cyber Security 2025 (Ubuntu Linux 24.04)
+>* Welcome to Cyber Security Environments ( Worldskills Korea 2025 | [Ubuntu Linux 24.04] ) *
 >
 >```
 ```vim
@@ -46,10 +46,11 @@ mv /etc/netplan/50-cloud-init.yaml /etc/netplan/config.yaml
 vim /etc/netplan/config.yaml
 ```
 >```yaml
->networks:
+>network:
 >  ethernets:
->    ens33:
+>    ens32:
 >      dhcp4: false
+>  renderer: networkd
 >  version: 2
 >```
 ```vim
@@ -65,24 +66,48 @@ systemctl restart ssh
 systemctl enable ssh
 ```
 ```vim
-hostnamectl set-hostname secure
-vim /etc/hosts
+timedatectl set-timezone Asia/Seoul
+hostnamectl set-hostname security
+sed -i "s/server/security/g" /etc/hosts
+vim /etc/rc.local
 ```
 >```vim
->127.0.1.1 secure secure
+>#!/bin/bash
+>
+>sleep 10; sysctl -p > /var/log/rc-local;
 >```
 ```vim
-timedatectl set-timezone Asia/Seoul
+chmod +x /etc/rc.local
+touch /var/log/rc-local
+systemctl enable rc-local
+systemctl restart rc-local
 ```
 
-## 1. VLAN 설정 (VLAN settings)
+## 1. 호스트명 변경 및 IP 설정 (Change the hostname & IPv4 Address settings)
 ### < *Configuration* >
-- [ fw ]
+- [ fw ] - *Default configuration (Hostname & Network)*
 ```vim
+hostnamectl set-hostname fw
+sed -i "s/security/fw/g" /etc/hosts
 modprobe 8021q
 echo "8021q" | tee -a /etc/modules
+ip link show | grep "link/ether" >> /etc/udev/rules.d/70.rules
+vim /etc/udev/rules.d/70.rules
 ```
-* Network Configuration
+>```vim
+>ACTION=="add",SUBSYSTEM=="net",ATTR{address}=="(macAddress|ens32)",NAME="eth1"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{address}=="(macAddress|ens33)",NAME="eth2"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{address}=="(macAddress|ens34)",NAME="eth3"
+>```
+```vim
+vim /etc/default/grub
+```
+>```vim
+>GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"
+>```
+```vim
+reboot
+```
 ```vim
 vim /etc/netplan/config.yaml
 ```
@@ -105,25 +130,34 @@ vim /etc/netplan/config.yaml
 >      id: 20
 >      link: eth1
 >      addresses: [192.168.70.254/25]
->  version: 2
 >  renderer: networkd
+>  version: 2
 >```
 ```vim
+netplan apply
+```
+- [ isp ] - *Default configuration (Hostname & Network)*
+```vim
+hostnamectl set-hostname isp
+sed -i "s/security/isp/g" /etc/hosts
+modprobe 8021q
+echo "8021q" | tee -a /etc/modules
 ip link show | grep "link/ether" >> /etc/udev/rules.d/70.rules
-cat /sys/class/net/vlan*/ifindex >> /etc/udev/rules.d/70.rules
 vim /etc/udev/rules.d/70.rules
 ```
 >```vim
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(macaddress)",NAME="eth"
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.10"
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.20"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{address}=="(macAddress|ens32)",NAME="eth1"
+>ACTION=="add",SUBSYSTEM=="net",ATTR{address}=="(macAddress|ens33)",NAME="eth2"
 >```
-- [ isp ]
 ```vim
-modprobe 8021q
-echo "8021q" | tee -a /etc/modules
+vim /etc/default/grub
 ```
-* Network Configuration
+>```vim
+>GRUB_CMDLINE_LINUX="net.ifnames=0 biosdevname=0"
+>```
+```vim
+reboot
+```
 ```vim
 vim /etc/netplan/config.yaml
 ```
@@ -144,16 +178,96 @@ vim /etc/netplan/config.yaml
 >      id: 50
 >      link: eth1
 >      addresses: [180.20.10.65/28]
->  version: 2
 >  renderer: networkd
+>  version: 2
 >```
 ```vim
-ip link show | grep "link/ether" >> /etc/udev/rules.d/70.rules
-cat /sys/class/net/vlan*/ifindex >> /etc/udev/rules.d/70.rules
-vim /etc/udev/rules.d/70.rules
+netplan apply
+```
+- [ exsrv ] - *Default configuration (Hostname & Network)*
+```vim
+hostnamectl set-hostname exsrv
+sed -i "s/security/exsrv/g" /etc/hosts
+modprobe 8021q
+echo "8021q" | tee -a /etc/modules
+```
+```vim
+vim /etc/netplan/config.yaml
+```
+>```yaml
+>network:
+>  ethernets:
+>    ens32:
+>      dhcp4: false
+>  vlans:
+>    vlan.50:
+>      id: 50
+>      link: ens32
+>      addresses: [180.20.10.70/28]
+>      routes:
+>        - to: default
+>          via: 180.20.10.65
+>      nameservers:
+>        addresses: [180.20.10.70]
+>  renderer: networkd
+>  version: 2
+>```
+```vim
+netplan apply
+```
+
+## 2. DHCP 서버 구성 (DHCP Server configurations)
+### < *Configuration* >
+- [ exsrv ] - *ISC DHCP Server configurations*
+```vim
+vim /etc/default/isc-dhcp-server
 ```
 >```vim
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(macaddress)",NAME="eth"
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.40"
->ACTION=="add",SUBSYSTEM=="net",ATTR{ifindex}=="(ifindex)",NAME="vlan.50"
+>INTERFACESv4="vlan.50"
+>#INTERFACESv6=""
 >```
+```vim
+vim /etc/dhcp/dhcpd.conf
+```
+>```vim
+>subnet 200.10.10.0 netmask 255.255.255.240 {
+>range 200.10.10.1 200.10.10.3;
+>option routers 200.10.10.14;
+>#option domain-name "";
+>#option domain-name-servers;
+>default-lease-time 600;
+>max-lease-time 7200;
+>}
+>
+>subnet 180.20.10.0 netmask 255.255.255.240 {
+>range 180.20.10.4 180.20.10.7;
+>option routers 180.20.10.1;
+>option domain-name "korea.com";
+>option domain-name-servers 180.20.10.70;
+>default-lease-time 600;
+>max-lease-time 7200;
+>}
+>
+>subnet 180.20.10.64 netmask 255.255.255.240 {
+>}
+>
+>host fw {
+>hardware ethernet (00:0c:29):(fw_mac);
+>fixed-address 200.10.10.1;
+>}
+>```
+```vim
+systemctl enable isc-dhcp-server
+systemctl restart isc-dhcp-server
+```
+- [ isp ] - *ISC DHCP Relay configurations*
+```vim
+vim /etc/default/isc-dhcp-relay
+```
+>```vim
+>SERVERS="180.20.10.70"
+>```
+```vim
+systemctl enable isc-dhcp-relay
+systemctl restart isc-dhcp-relay
+```
