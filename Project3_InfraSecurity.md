@@ -1,5 +1,5 @@
 # 🛡 사이버 보안 *Cyber Security* 🔐
-###### ⚔ Worldskills Korea 2025 Cyber Security Assignment Practice [ *Written by NullBins* ]
+###### ⚔ Worldskills Korea 2025 Cyber Security Assignment Practices 🗡 [ *Written by NullBins* ]
 - By default, the commands are executed as a root user.
 
 # [ *Project-3* ] <*Infrastructure configuration & Security enhancements*>
