@@ -383,3 +383,31 @@ vim /etc/default/isc-dhcp-relay
 systemctl enable isc-dhcp-relay
 systemctl restart isc-dhcp-relay
 ```
+
+## 3. FW NAT 구성 (FW NAT Configurations)
+### < *Configuration* >
+- [ fw ] - *UFW(Uncomplicated Firewall) NAT Configurations*
+```vim
+vim /etc/default/ufw
+```
+>```vim
+>DEFAULT_FORWARD_POLICY="ACCEPT"
+>```
+```vim
+vim /etc/ufw/before.rules
+```
+>```vim
+>*nat
+>:POSTROUTING ACCEPT [0:0]
+>
+>-A POSTROUTING -s 192.168.70.0/24 -o eth3 -j MASQUERADE
+>-A POSTROUTING -s 10.30.30.0/24 -o eth3 -j MASQUERADE
+>
+>COMMIT
+>```
+```vim
+ufw disable
+ufw enable
+ufw status
+iptables -t nat -L
+```
