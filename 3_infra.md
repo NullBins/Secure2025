@@ -188,6 +188,12 @@ netplan apply
 ```vim
 hostnamectl set-hostname exsrv
 sed -i "s/security/exsrv/g" /etc/hosts
+vim /etc/hosts
+```
+>```vim
+>127.0.1.1 exsrv.korea.com exsrv
+>```
+```vim
 modprobe 8021q
 echo "8021q" | tee -a /etc/modules
 ```
@@ -209,6 +215,64 @@ vim /etc/netplan/config.yaml
 >          via: 180.20.10.65
 >      nameservers:
 >        addresses: [180.20.10.70]
+>  renderer: networkd
+>  version: 2
+>```
+```vim
+netplan apply
+```
+- [ ns ] - *Default configuration (Hostname & Network)*
+```vim
+hostnamectl set-hostname ns
+sed -i "s/security/ns/g" /etc/hosts
+vim /etc/hosts
+```
+>```vim
+>127.0.1.1 ns.cyber.net ns
+>```
+```vim
+vim /etc/netplan/config.yaml
+```
+>```yaml
+>network:
+>  ethernets:
+>    ens32:
+>      addresses: [10.30.30.1/29]
+>      routes:
+>        - to: default
+>          via: 10.30.30.6
+>      nameservers:
+>        addresses: [200.10.10.1]
+>      dhcp4: false
+>  renderer: networkd
+>  version: 2
+>```
+```vim
+netplan apply
+```
+- [ www ] - *Default configuration (Hostname & Network)*
+```vim
+hostnamectl set-hostname www
+sed -i "s/security/www/g" /etc/hosts
+vim /etc/hosts
+```
+>```vim
+>127.0.1.1 www.cyber.net www
+>```
+```vim
+vim /etc/netplan/config.yaml
+```
+>```yaml
+>network:
+>  ethernets:
+>    ens32:
+>      addresses: [10.30.30.2/29]
+>      routes:
+>        - to: default
+>          via: 10.30.30.6
+>      nameservers:
+>        addresses: [10.30.30.1]
+>      dhcp4: false
 >  renderer: networkd
 >  version: 2
 >```
@@ -266,6 +330,54 @@ vim /etc/default/isc-dhcp-relay
 ```
 >```vim
 >SERVERS="180.20.10.70"
+>```
+```vim
+systemctl enable isc-dhcp-relay
+systemctl restart isc-dhcp-relay
+```
+- [ ns ] - *ISC DHCP Server configurations*
+```vim
+vim /etc/default/isc-dhcp-server
+```
+>```vim
+>INTERFACESv4="ens32"
+>#INTERFACESv6=""
+>```
+```vim
+vim /etc/dhcp/dhcpd.conf
+```
+>```vim
+>subnet 192.168.70.0 netmask 255.255.255.128 {
+>range 192.168.70.64 192.168.70.126;
+>option routers 192.168.70.1;
+>#option domain-name "cyber.net";
+>#option domain-name-servers 10.30.30.1;
+>default-lease-time 600;
+>max-lease-time 7200;
+>}
+>
+>subnet 192.168.70.128 netmask 255.255.255.128 {
+>range 192.168.70.129 192.168.70.191;
+>option routers 192.168.70.254;
+>#option domain-name "cyber.net";
+>#option domain-name-servers 10.30.30.1;
+>default-lease-time 600;
+>max-lease-time 7200;
+>}
+>
+>subnet 10.30.30.0 netmask 255.255.255.248 {
+>}
+>```
+```vim
+systemctl enable isc-dhcp-server
+systemctl restart isc-dhcp-server
+```
+- [ fw ] - *ISC DHCP Relay configurations*
+```vim
+vim /etc/default/isc-dhcp-relay
+```
+>```vim
+>SERVERS="10.30.30.1"
 >```
 ```vim
 systemctl enable isc-dhcp-relay
