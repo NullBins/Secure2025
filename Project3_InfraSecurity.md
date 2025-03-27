@@ -427,3 +427,94 @@ ufw allow in proto udp to any port 67
 ufw reload
 ufw status verbose
 ```
+
+## 5. 도메인 서비스 구성 (Domain Service Configurations)
+### < *Configuration* >
+- [ ns ] - *BIND9(Named Service) Configurations*
+```vim
+vim /etc/bind/named.conf
+```
+>```vim
+>#include "/etc/bind/named.conf.options";
+>#include "/etc/bind/named.conf.local";
+>#include "/etc/bind/named.conf.default-zones";
+>
+>options {
+>  directory "/var/cache/bind";
+>  listen-on { any; };
+>  allow-query { any; };
+>  recursion yes;
+>  dnssec-validation no;
+>};
+>
+>zone "cyber.net" {
+>  type master;
+>  file "cyber.zone";
+>};
+>```
+```vim
+cp /etc/bind/db.0 /var/cache/bind/cyber.zone
+chown bind:bind -R /var/cache/bind/
+sed -i "s/localhost/ns.cyber.net/g" /var/cache/bind/cyber.zone
+vim /var/cache/bind/cyber.zone
+```
+>```vim
+>@    IN    NS    ns.cyber.net
+>ns    IN    A    10.30.30.1
+>www    IN    A    10.30.30.2
+>```
+```vim
+systemctl enable named
+systemctl restart named
+```
+- [ exsrv ] - *BIND9(Named Service) Configurations*
+```vim
+vim /etc/bind/named.conf
+```
+>```vim
+>#include "/etc/bind/named.conf.options";
+>#include "/etc/bind/named.conf.local";
+>#include "/etc/bind/named.conf.default-zones";
+>
+>options {
+>  directory "/var/cache/bind";
+>  listen-on { any; };
+>  allow-query { any; };
+>  recursion yes;
+>  dnssec-validation no;
+>};
+>
+>zone "korea.com" {
+>  type master;
+>  file "korea.zone";
+>};
+>
+>zone "cyber.net" {
+>  type master;
+>  file "cyber.zone";
+>};
+>```
+```vim
+cp /etc/bind/db.0 /var/cache/bind/korea.zone
+cp /etc/bind/db.0 /var/cache/bind/cyber.zone
+chown bind:bind -R /var/cache/bind/
+sed -i "s/localhost/exsrv.cyber.net/g" /var/cache/bind/korea.zone
+sed -i "s/localhost/www.cyber.net/g" /var/cache/bind/cyber.zone
+vim /var/cache/bind/korea.zone
+```
+>```vim
+>@    IN    NS    www.cyber.net
+>www    IN    A    200.10.10.1
+>```
+```vim
+vim /var/cache/bind/cyber.zone
+```
+>```vim
+>@    IN    NS    exsrv.cyber.net
+>exsrv    IN    A    180.20.10.70
+>www    IN    A    180.20.10.70
+>```
+```vim
+systemctl enable named
+systemctl restart named
+```
