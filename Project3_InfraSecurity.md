@@ -414,3 +414,16 @@ ufw status
 systemctl restart ufw
 iptables -t nat -L -n
 ```
+
+## 4. FW 방화벽 구성 (FW Firewall Configurations)
+### < *Configuration* >
+- [ fw ] - *UFW(Uncomplicated Firewall) Firewall Configurations*
+```vim
+ufw default deny incoming
+ufw allow in on eth3 proto tcp to any port 80
+ufw allow in on eth3 proto tcp to any port 443
+ufw allow in on vlan.10 proto tcp to any port 20250
+ufw allow in proto udp to any port 67
+ufw reload
+ufw status verbose
+```
