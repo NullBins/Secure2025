@@ -384,7 +384,7 @@ systemctl enable isc-dhcp-relay
 systemctl restart isc-dhcp-relay
 ```
 
-## 3. FW NAT 구성 (FW NAT Configurations)
+## 3. FW NAT 구성 (FW NAT Configurations | Masquerade & Port Forwarding)
 ### < *Configuration* >
 - [ fw ] - *UFW(Uncomplicated Firewall) NAT Configurations*
 ```vim
@@ -398,8 +398,10 @@ vim /etc/ufw/before.rules
 ```
 >```vim
 >*nat
+>:PREROUTING ACCEPT [0:0]
 >:POSTROUTING ACCEPT [0:0]
 >
+>-A PREROUTING -d 200.10.10.1 -p tcp --dport 80 -j DNAT --to 10.30.30.2
 >-A POSTROUTING -s 192.168.70.0/24 -o eth3 -j MASQUERADE
 >-A POSTROUTING -s 10.30.30.0/24 -o eth3 -j MASQUERADE
 >
@@ -409,5 +411,6 @@ vim /etc/ufw/before.rules
 ufw disable
 ufw enable
 ufw status
-iptables -t nat -L
+systemctl restart ufw
+iptables -t nat -L -n
 ```
