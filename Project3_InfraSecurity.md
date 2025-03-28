@@ -2,7 +2,7 @@
 ###### ⚔ Worldskills Korea 2025 Cyber Security Assignment Practices 🗡 [ *Written by NullBins* ]
 - By default, the commands are executed as a root user.
 
-# [ *Project-3* ] <*Infrastructure configuration & Security enhancements*>
+# [ *Project-3* ] <*🌐Infrastructure configuration & Security enhancements💠*>
 
 ## 0. 기본 설정 (Default settings)
 ### < *Configuration* >
