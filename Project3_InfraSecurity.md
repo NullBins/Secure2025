@@ -295,7 +295,7 @@ vim /etc/dhcp/dhcpd.conf
 ```
 >```vim
 >subnet 200.10.10.0 netmask 255.255.255.240 {
->range 200.10.10.1 200.10.10.3;
+>range 200.10.10.2 200.10.10.3;
 >option routers 200.10.10.14;
 >#option domain-name "";
 >#option domain-name-servers;
@@ -313,10 +313,11 @@ vim /etc/dhcp/dhcpd.conf
 >}
 >
 >subnet 180.20.10.64 netmask 255.255.255.240 {
+>option routers 180.20.10.65;
 >}
 >
 >host fw {
->hardware ethernet (00:0c:29):(fw_mac);
+>hardware ethernet [fw mac address];
 >fixed-address 200.10.10.1;
 >}
 >```
@@ -350,8 +351,8 @@ vim /etc/dhcp/dhcpd.conf
 >subnet 192.168.70.0 netmask 255.255.255.128 {
 >range 192.168.70.64 192.168.70.126;
 >option routers 192.168.70.1;
->#option domain-name "cyber.net";
->#option domain-name-servers 10.30.30.1;
+>option domain-name "cyber.net";
+>option domain-name-servers 10.30.30.1;
 >default-lease-time 600;
 >max-lease-time 7200;
 >}
@@ -359,13 +360,14 @@ vim /etc/dhcp/dhcpd.conf
 >subnet 192.168.70.128 netmask 255.255.255.128 {
 >range 192.168.70.129 192.168.70.191;
 >option routers 192.168.70.254;
->#option domain-name "cyber.net";
->#option domain-name-servers 10.30.30.1;
+>option domain-name "cyber.net";
+>option domain-name-servers 10.30.30.1;
 >default-lease-time 600;
 >max-lease-time 7200;
 >}
 >
 >subnet 10.30.30.0 netmask 255.255.255.248 {
+>option routers 10.30.30.6;
 >}
 >```
 ```vim
@@ -424,6 +426,7 @@ ufw allow in on eth3 proto tcp to any port 80
 ufw allow in on eth3 proto tcp to any port 443
 ufw allow in on vlan.10 proto tcp to any port 20250
 ufw allow in proto udp to any port 67
+ufw allow in proto udp to any port 68
 ufw reload
 ufw status verbose
 ```
