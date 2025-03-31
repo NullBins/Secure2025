@@ -6,10 +6,10 @@
 </div>
 
 ## ⚔ 1과제 (*Hacking*) 🗡
-- 1과제 솔루션(Assignmnet Solutions) : [[Hackings]()]
+- 1과제 솔루션(Assignmnet Solutions) : [[Hacking](https://dreamhack.io/)]
 
 ## 🧱 2과제 (*Network security device settings*) ⚒
-- 2과제 솔루션(Assignmnet Solutions) : [[Network Security]()]
+- 2과제 솔루션(Assignmnet Solutions) : [[Network Security](https://github.com/NullBins/Secure2025/blob/main/Project2_NetworkSecurity.md)]
 
 ## 🛡 3과제 (*Infrastructure configuration & Security enhancements*) 🔐
 - 3과제 솔루션(Assignmnet Solutions) : [[Infrastructure Security](https://github.com/NullBins/Secure2025/blob/main/Project3_InfraSecurity.md)]
