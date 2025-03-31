@@ -587,3 +587,33 @@ vim /etc/apache2/sites-available/default-ssl.conf
 systemctl enable apache2
 systemctl restart apache2
 ```
+
+## 7. FW SSH 설정 및 보안 강화 (FW SSH Configuration & Security Enhancements)
+### < *Configuration* >
+- [ fw ] - *SSH Service Configurations*
+```vim
+vim /etc/ssh/sshd_config
+```
+>```vim
+>Port 20250
+>Match Address 192.168.70.0/25
+>  AllowUsers cyber
+>PasswordAuthentication no
+>PubkeyAuthentication yes
+>```
+```vim
+ssh-keygen -t rsa -b 2048 -C "fw.key"
+```
+- [ user01 ] - *SSH Service Connections*
+```vim
+vim /home/cyber/fw.sh
+```
+>```vim
+>#!/bin/bash
+>ssh -p 20250 -i /home/cyber/.ssh/fw.key cyber@192.168.70.1
+>```
+```vim
+chown cyber:cyber /home/cyber/fw.sh
+chmod 700 /home/cyber/fw.sh
+
+```
