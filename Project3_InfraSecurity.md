@@ -601,8 +601,7 @@ vim /etc/ssh/sshd_config
 ```
 >```vim
 >Port 20250
->Match Address 192.168.70.0/25
->AllowUsers cyber
+>AllowUsers cyber@192.168.70.0/25
 >PasswordAuthentication no
 >PubkeyAuthentication yes
 >#PermitRootLogin yes
