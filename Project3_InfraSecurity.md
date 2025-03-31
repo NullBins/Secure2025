@@ -464,7 +464,7 @@ sed -i "s/localhost/ns.cyber.net/g" /var/cache/bind/cyber.zone
 vim /var/cache/bind/cyber.zone
 ```
 >```vim
->@    IN    NS    ns.cyber.net
+>@    IN    NS    ns.cyber.net.
 >ns    IN    A    10.30.30.1
 >www    IN    A    10.30.30.2
 >```
@@ -508,14 +508,14 @@ sed -i "s/localhost/www.cyber.net/g" /var/cache/bind/cyber.zone
 vim /var/cache/bind/korea.zone
 ```
 >```vim
->@    IN    NS    www.cyber.net
+>@    IN    NS    www.cyber.net.
 >www    IN    A    200.10.10.1
 >```
 ```vim
 vim /var/cache/bind/cyber.zone
 ```
 >```vim
->@    IN    NS    exsrv.cyber.net
+>@    IN    NS    exsrv.cyber.net.
 >exsrv    IN    A    180.20.10.70
 >www    IN    A    180.20.10.70
 >```
