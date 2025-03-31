@@ -523,3 +523,67 @@ vim /var/cache/bind/cyber.zone
 systemctl enable named
 systemctl restart named
 ```
+
+## 6. 웹 서비스 및 보안 구성 (Web Service & Security Configurations)
+### < *Configuration* >
+- [ www ] - *Apache2 Service (Wordpress Engine) Configurations*
+```vim
+cd /home/cyber/wordpress
+gunzip ./latest.tar.gz
+tar -xvf ./latest.tar
+mv -iv ./wordpress /var/www/html/
+cp /var/www/html/wordpress/wp-config-sample.php /var/www/html/wordpress/wp-config.php
+cat ./salt >> /var/www/html/wordpress/wp-config.php
+mysql -u root
+  mysql> create database wordpress;
+  mysql> create user 'wp_user'@'localhost' identified by 'cyber2025!@';
+  mysql> grant all privileges on wordpress.* to 'wp_user'@'localhost';
+  mysql> flush privileges;
+  mysql> exit
+vim /var/www/html/wordpress/wp-config.php
+```
+>```php
+>define('DB_NAME', 'wordpress');
+>define('DB_USER', 'wp_user');
+>define('DB_PASSWORD', 'cyber2025!@');
+>define('DB_HOST', 'localhost');
+>```
+```vim
+vim /etc/apache2/apache2.conf
+```
+>```vim
+><Directory /var/www/>
+>  Options -Indexes
+>  AllowOverride None
+>  Require all granted
+></Directory>
+>```
+```vim
+a2enmod ssl
+a2ensite default-ssl.conf
+vim /etc/apache2/sites-available/000-default.conf
+```
+>```vim
+><VirtualHost: *:80>
+>  ServerName www.cyber.net
+>  ServerAdmin cyber_admin@cyber.net
+>  DocumentRoot /var/www/html/wordpress
+>  Redirect permanent / https://www.cyber.net/
+></VirtualHost>
+>```
+```vim
+vim /etc/apache2/sites-available/default-ssl.conf
+```
+>```vim
+><VirtualHost: *:443>
+>  ServerName www.cyber.net
+>  ServerAdmin cyber_admin@cyber.net
+>  DocumentRoot /var/www/html/wordpress
+>  SSLCertificateFile /etc/ssl/certs/ssl-cert-snakeoil.pem
+>  SSLCertificateKeyFile /etc/ssl/private/ssl-cert-snakeoil.key
+></VirtualHost>
+>```
+```vim
+systemctl enable apache2
+systemctl restart apache2
+```
