@@ -508,7 +508,7 @@ sed -i "s/localhost/www.cyber.net/g" /var/cache/bind/cyber.zone
 vim /var/cache/bind/korea.zone
 ```
 >```vim
->@    IN    NS    www.cyber.net.
+>@    IN    NS    www.korea.com.
 >www    IN    A    200.10.10.1
 >```
 ```vim
