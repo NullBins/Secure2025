@@ -295,7 +295,7 @@ vim /etc/dhcp/dhcpd.conf
 ```
 >```vim
 >subnet 200.10.10.0 netmask 255.255.255.240 {
->range 200.10.10.2 200.10.10.3;
+>range 200.10.10.1 200.10.10.3;
 >option routers 200.10.10.14;
 >#option domain-name "";
 >#option domain-name-servers;
@@ -393,6 +393,7 @@ systemctl restart isc-dhcp-relay
 vim /etc/default/ufw
 ```
 >```vim
+>DEFAULT_INPUT_POLICY="DROP"
 >DEFAULT_FORWARD_POLICY="ACCEPT"
 >```
 ```vim
@@ -403,11 +404,10 @@ vim /etc/ufw/before.rules
 >:PREROUTING ACCEPT [0:0]
 >:POSTROUTING ACCEPT [0:0]
 >
->-A PREROUTING -d 200.10.10.1 -p tcp --dport 53 -j DNAT --to 180.20.10.70
->-A PREROUTING -d 200.10.10.1 -p udp --dport 53 -j DNAT --to 180.20.10.70
 >-A PREROUTING -d 200.10.10.1 -p tcp --dport 80 -j DNAT --to 10.30.30.2
+>-A PREROUTING -d 200.10.10.1 -p tcp --dport 443 -j DNAT --to 10.30.30.2
 >-A POSTROUTING -s 192.168.70.0/24 -o eth3 -j MASQUERADE
->-A POSTROUTING -s 10.30.30.0/24 -o eth3 -j MASQUERADE
+>-A POSTROUTING -s 10.30.30.0/29 -o eth3 -j MASQUERADE
 >
 >COMMIT
 >```
