@@ -704,7 +704,7 @@ chmod 750 /home/cyber/ssh-log.sh
 vim /etc/crontab
 ```
 >```vim
->1 0 * * *  root  /home/cyber/ssh-log.sh
+>1 0  * * *  cyber  /home/cyber/ssh-log.sh
 >```
 ```vim
 systemctl restart cron
