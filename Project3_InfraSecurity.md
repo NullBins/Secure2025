@@ -652,7 +652,7 @@ vim /home/cyber/ssh-log.sh
 >#!/bin/bash
 >
 >LOG_DIR="/home/cyber/ssh-log"
->CDATE=$(date +"%Y-%m-%d %H:%M")
+>CDATE=$(date +"%Y-%m-%d %H:%M:%S")
 >DATE_FORMAT=$(date +"%Y%m%d")
 >TIME_FORMAT=$(date +"%H%M")
 >LOG_FILE="${LOG_DIR}/${DATE_FORMAT}_${TIME_FORMAT}.log"
@@ -699,4 +699,13 @@ vim /home/cyber/ssh-log.sh
 ```vim
 chown cyber:cyber /home/cyber/ssh-log.sh
 chmod 750 /home/cyber/ssh-log.sh
+```
+```vim
+vim /etc/crontab
+```
+>```vim
+>1 0 * * *  root  /home/cyber/ssh-log.sh
+>```
+```vim
+systemctl restart cron
 ```
