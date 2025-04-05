@@ -652,13 +652,13 @@ vim /home/cyber/ssh-log.sh
 >#!/bin/bash
 >
 >LOG_DIR="/home/cyber/ssh-log"
->CDATE=$(date + "%Y-%m-%d %H:%M")
->DATE_FORMAT=$(date + "%Y%m%d")
->TIME_FORMAT=$(date + "%H%M")
+>CDATE=$(date +"%Y-%m-%d %H:%M")
+>DATE_FORMAT=$(date +"%Y%m%d")
+>TIME_FORMAT=$(date +"%H%M")
 >LOG_FILE="${LOG_DIR}/${DATE_FORMAT}_${TIME_FORMAT}.log"
 >
 >if [ ! -d "$LOG_DIR" ]; then
->  mkdir -p "$LOG_DIR"
+>    mkdir -p "$LOG_DIR"
 >fi
 >
 >echo "" | tee "$LOG_FILE"
@@ -680,7 +680,7 @@ vim /home/cyber/ssh-log.sh
 >echo "" | tee -a "$LOG_FILE"
 >
 ># Access Network
->echo "[My Net Access IP]" | tee -a "LOG_FILE"
+>echo "[My Net Access IP]" | tee -a "$LOG_FILE"
 >grep "Ignore " /var/log/fail2ban.log | grep "sshd" | awk '{print $8}' | sort | uniq -c | while read count ip; do
 >echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE"
 >done
@@ -688,8 +688,8 @@ vim /home/cyber/ssh-log.sh
 >
 ># ETC Connect IP List
 >echo "[Access IP]" | tee -a "$LOG_FILE"
->grep "Accepted " /var/log/auth.log | grep "sshd" | awk '{print $9}' | sort | uniq -c | while read count ip; do
->echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE" 
+>grep "Found " /var/log/fail2ban.log | grep "sshd" | awk '{print $8}' | sort | uniq -c | while read count ip; do
+>echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE"
 >done
 >echo "" | tee -a "$LOG_FILE"
 >
