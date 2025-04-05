@@ -624,3 +624,79 @@ chown cyber:cyber /home/cyber/fw.sh
 chmod 700 /home/cyber/fw.sh
 ./fw.sh
 ```
+
+## 8. WWW SSH 보안 강화 스크립트 (WWW SSH Security Script)
+### < *Configuration* >
+- [ www ] - *Fail2Ban Service Configuration & SSH Shell Scripting*
+```vim
+cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+vim /etc/fail2ban/jail.local
+```
+>```vim
+>[sshd]
+>enabled = true
+>port = ssh
+>filter = sshd
+>logpath = /var/log/auth.log
+>maxretry = 5
+>findtime = 300
+>bantime = 600
+>ignoreip = 192.168.70.0/25
+>```
+```vim
+systemctl enable fail2ban
+systemctl restart fail2ban
+vim /home/cyber/ssh-log.sh
+```
+>```vim
+>#!/bin/bash
+>
+>LOG_DIR="/home/cyber/ssh-log"
+>CDATE=$(date + "%Y-%m-%d %H:%M")
+>DATE_FORMAT=$(date + "%Y%m%d")
+>TIME_FORMAT=$(date + "%H%M")
+>LOG_FILE="${LOG_DIR}/${DATE_FORMAT}_${TIME_FORMAT}.log"
+>
+>if [ ! -d "$LOG_DIR" ]; then
+>  mkdir -p "$LOG_DIR"
+>fi
+>
+>echo "" | tee "$LOG_FILE"
+>echo "DATE: $CDATE" | tee -a "$LOG_FILE"
+>echo "" | tee -a "$LOG_FILE"
+>
+># Ban IP List
+>echo "[Ban IP]" | tee -a "$LOG_FILE"
+>grep "Ban " /var/log/fail2ban.log | grep "sshd" | awk '{print $NF}' | sort | uniq -c | while read count ip; do
+>echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE"
+>done
+>echo "" | tee -a "$LOG_FILE"
+>
+># Unban IP List
+>echo "[Unban IP]" | tee -a "$LOG_FILE"
+>grep "Unban " /var/log/fail2ban.log | grep "sshd" | awk '{print $NF}' | sort | uniq -c | while read count ip; do
+>echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE"
+>done
+>echo "" | tee -a "$LOG_FILE"
+>
+># Access Network
+>echo "[My Net Access IP]" | tee -a "LOG_FILE"
+>grep "Ignore " /var/log/fail2ban.log | grep "sshd" | awk '{print $8}' | sort | uniq -c | while read count ip; do
+>echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE"
+>done
+>echo "" | tee -a "$LOG_FILE"
+>
+># ETC Connect IP List
+>echo "[Access IP]" | tee -a "$LOG_FILE"
+>grep "Accepted " /var/log/auth.log | grep "sshd" | awk '{print $9}' | sort | uniq -c | while read count ip; do
+>echo -e "\t$count $ip [sshd]" | tee -a "$LOG_FILE" 
+>done
+>echo "" | tee -a "$LOG_FILE"
+>
+># Permissions
+>chmod 700 "$LOG_FILE"
+>```
+```vim
+chown cyber:cyber /home/cyber/ssh-log.sh
+chmod 750 /home/cyber/ssh-log.sh
+```
