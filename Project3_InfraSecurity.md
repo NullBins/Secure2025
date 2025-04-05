@@ -601,12 +601,11 @@ vim /etc/ssh/sshd_config
 ```
 >```vim
 >Port 20250
->AllowUsers cyber@192.168.70.0/25
 >PasswordAuthentication no
 >PubkeyAuthentication yes
 >#PermitRootLogin yes
->#UsePAM yes
->#PrintMotd no
+>Match Address 192.168.70.0/25
+>  AllowUsers cyber
 >```
 ```vim
 systemctl restart ssh
