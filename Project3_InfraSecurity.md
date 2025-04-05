@@ -694,7 +694,7 @@ vim /home/cyber/ssh-log.sh
 >echo "" | tee -a "$LOG_FILE"
 >
 ># Permissions
->chmod 700 "$LOG_FILE"
+>chmod 750 "$LOG_FILE"
 >```
 ```vim
 chown cyber:cyber /home/cyber/ssh-log.sh
