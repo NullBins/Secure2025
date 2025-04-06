@@ -159,10 +159,53 @@ ip nat inside source list IN-NET interface Serial0/0/0 overload
 ip classless
 ```
 
-## 4. Home-Router settings (Wireless LAN Router settings)
+## 4. Home-Router 설정 (Wireless LAN Router settings)
 ### < *Configuration* >
 - [ HOME-RT ]
 
 > ![Image](https://github.com/NullBins/Secure2025/blob/main/IMG/home-rt-dhcp1.png)
 
 > ![Image](https://github.com/NullBins/Secure2025/blob/main/IMG/home-rt-dhcp2.png)
+
+## 5. A-SW 보안 설정 (A-SW Security settings)
+### < *Configuration* >
+- [ A-SW ]
+```bash
+configure terminal
+ vlan 99
+exit
+interface vlan 99
+ ip address 192.168.10.253 255.255.255.0
+interface fa0/1
+ switchport mode access
+ switchport access vlan 99
+ switchport port-security
+ switchport port-security maximum 1
+ switchport port-security violation shutdown
+ switchport port-security mac-address sticky
+ip domain-name cyber.net
+crypto key generate rsa general-keys modules 1024
+username ssh-admin privilege 15 secret cyber2025!@
+ip access-list standard SSH-ACCESS
+ permit 192.168.10.128 0.0.0.31
+ip ssh version 2
+line vty 0 4
+ transport input ssh
+ access-class SSH-ACCESS in
+ login local
+```
+
+## 6. SH-SW 보안 설정 (SH-SW Security settings)
+### < *Configuration* >
+- [ A-SW ]
+```bash
+ip access-list extended permit-rule
+ deny ip any any
+ permit ospf any any
+ permit tcp any host 27.0.7.1 eq www
+ permit icmp any any echo-reply
+ permit tcp any any eq www established
+ permit udp any any eq domain
+interface GigabitEthernet0/1
+ ip access-group permit-rule in
+```
