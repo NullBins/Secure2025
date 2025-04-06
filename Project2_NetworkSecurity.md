@@ -133,3 +133,36 @@ router ospf 10
  network 27.0.7.254 0.0.0.0 area 0
  network 27.0.6.254 0.0.0.0 area 0
 ```
+
+## 3. NAT 설정 (Network Address Translation)
+### < *Configuration* >
+- [ A-RT1 ]
+```bash
+interface Serial0/0/0
+ ip nat outside
+interface GigabitEthernet0/0
+ ip nat inside
+ip access-list extended IN-NET
+ permit ip 192.168.10.0 0.0.0.255 any
+ip nat inside source list IN-NET interface Serial0/0/0 overload
+ip classless
+```
+- [ A-RT2 ]
+```bash
+interface GigabitEthernet0/0
+ ip nat inside
+interface Serial0/0/0
+ ip nat outside
+ip access-list extended IN-NET
+ permit ip 192.168.20.0 0.0.0.255 any
+ip nat inside source list IN-NET interface Serial0/0/0 overload
+ip classless
+```
+
+## 4. Home-Router settings (Wireless LAN Router settings)
+### < *Configuration* >
+- [ HOME-RT ]
+
+> ![Image](https://github.com/NullBins/Secure2025/blob/main/IMG/home-rt-dhcp1.png)
+
+> ![Image](https://github.com/NullBins/Secure2025/blob/main/IMG/home-rt-dhcp2.png)
