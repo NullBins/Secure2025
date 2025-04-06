@@ -209,3 +209,59 @@ ip access-list extended permit-rule
 interface GigabitEthernet0/1
  ip access-group permit-rule in
 ```
+
+## 7. GRE over IPsec VPN 설정 (GRE-over-IPsec VPN configuration)
+### < *Configuration* >
+- [ A-RT2 ]
+```bash
+interface Tunnel0
+ ip address 30.30.30.1 255.255.255.252
+ tunnel mode gre ip
+ tunnel source Serial0/0/0
+ tunnel destination 27.0.4.1
+ip route 27.0.5.0 0.0.0.3 tunnel 0
+license boot module c2900 technology-package securityk9
+crypto isakmp policy 5
+ encr 3des
+ hash md5
+ authentication pre-share
+ group 2
+crypto isakmp key cyber123 address 27.0.4.1
+ip access-list extended GRE-ACL
+ permit gre host 30.30.30.1 host 30.30.30.2
+crypto ipsec transform-set TS esp-3des esp-md5-hmac
+crypto map cMAP 10 ipsec-isakmp 
+ set peer 27.0.4.1
+ set transform-set TS 
+ match address GRE-ACL
+interface Serial0/0/0
+ no ip nat outside
+ crypto map cMAP
+ip access-list extended IN-NET
+ deny ip 192.168.20.0 0.0.0.255 27.0.5.0 0.0.0.3
+```
+- [ ISP ]
+```bash
+interface Tunnel0
+ ip address 30.30.30.1 255.255.255.252
+ tunnel mode gre ip
+ tunnel source Serial0/0/1
+ tunnel destination 27.0.2.1
+ip route 192.168.20.0 0.0.0.255 tunnel 0
+license boot module c2900 technology-package securityk9
+crypto isakmp policy 5
+ encr 3des
+ hash md5
+ authentication pre-share
+ group 2
+crypto isakmp key cyber123 address 27.0.2.1
+ip access-list extended GRE-ACL
+ permit gre host 30.30.30.2 host 30.30.30.1
+crypto ipsec transform-set TS esp-3des esp-md5-hmac
+crypto map cMAP 10 ipsec-isakmp 
+ set peer 27.0.2.1
+ set transform-set TS 
+ match address GRE-ACL
+interface Serial0/0/1
+ crypto map cMAP
+```
