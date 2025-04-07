@@ -17,27 +17,29 @@ service password-encryption
 
 ## 1. DHCP 서버 설정 (DHCP Server settings)
 ### < *Configuration* >
-- [ A-RT1 ]
+- [ A-RT2 ]
 ```bash
 ip dhcp excluded-address 192.168.10.1 192.168.10.127
 ip dhcp excluded-address 192.168.10.160 192.168.10.254
+ip dhcp excluded-address 192.168.20.1 192.168.20.99
+ip dhcp excluded-address 192.168.20.151 192.168.20.254
 !
 ip dhcp pool A1-POOL
  network 192.168.10.0 255.255.255.0
  default-router 192.168.10.254
  dns-server 27.0.5.1
  domain-name cyber.net
-```
-- [ A-RT2 ]
-```bash
-ip dhcp excluded-address 192.168.20.1 192.168.20.99
-ip dhcp excluded-address 192.168.20.151 192.168.20.254
-!
 ip dhcp pool A2-POOL
  network 192.168.20.0 255.255.255.0
  default-router 192.168.20.254
  dns-server 27.0.5.1
  domain-name cyber.net
+ip route 192.168.10.0 255.255.255.0 27.0.2.2 
+```
+- [ A-RT1 ]
+```bash
+interface GigabitEthernet0/0.99
+ ip helper-address 27.0.2.1
 ```
 - [ SH-SRV ]
 > ![Image](https://github.com/NullBins/Secure2025/blob/main/IMG/sh-srv-dhcp.png)
@@ -54,6 +56,7 @@ interface Serial0/0/0
  no frame-relay inverse-arp
  ip ospf network broadcast
  ip ospf priority 0
+ clock rate 2000000
 ```
 - [ B-RT ]
 ```bash
@@ -65,6 +68,7 @@ interface Serial0/3/0
  no frame-relay inverse-arp
  ip ospf network broadcast
  ip ospf priority 0
+ clock rate 2000000
 ```
 - [ C-RT ]
 ```bash
@@ -155,6 +159,7 @@ interface Serial0/0/0
  ip nat outside
 ip access-list extended IN-NET
  permit ip 192.168.20.0 0.0.0.255 any
+ deny ip 192.168.20.0 0.0.0.255 27.0.5.0 0.0.0.3
 ip nat inside source list IN-NET interface Serial0/0/0 overload
 ip classless
 ```
@@ -171,9 +176,7 @@ ip classless
 ### < *Configuration* >
 - [ A-SW ]
 ```bash
-configure terminal
- vlan 99
-exit
+vlan 99
 interface vlan 99
  ip address 192.168.10.253 255.255.255.0
 interface fa0/1
@@ -184,11 +187,11 @@ interface fa0/1
  switchport port-security violation shutdown
  switchport port-security mac-address sticky
 ip domain-name cyber.net
+ip ssh version 2
 crypto key generate rsa general-keys modules 1024
 username ssh-admin privilege 15 secret cyber2025!@
 ip access-list standard SSH-ACCESS
  permit 192.168.10.128 0.0.0.31
-ip ssh version 2
 line vty 0 4
  transport input ssh
  access-class SSH-ACCESS in
@@ -200,12 +203,14 @@ line vty 0 4
 - [ A-SW ]
 ```bash
 ip access-list extended permit-rule
- deny ip any any
  permit ospf any any
  permit tcp any host 27.0.7.1 eq www
- permit icmp any any echo-reply
+ permit tcp any host 27.0.7.1 eq 443
+ deny ip any any
  permit tcp any any eq www established
  permit udp any any eq domain
+ permit icmp any any echo
+ permit icmp any any echo-reply
 interface GigabitEthernet0/1
  ip access-group permit-rule in
 ```
@@ -216,11 +221,10 @@ interface GigabitEthernet0/1
 ```bash
 interface Tunnel0
  ip address 30.30.30.1 255.255.255.252
- tunnel mode gre ip
+ mtu 1476
  tunnel source Serial0/0/0
  tunnel destination 27.0.4.1
-ip route 27.0.5.0 0.0.0.3 tunnel 0
-license boot module c2900 technology-package securityk9
+ip route 27.0.5.0 255.255.255.252 30.30.30.2
 crypto isakmp policy 5
  encr 3des
  hash md5
@@ -228,27 +232,23 @@ crypto isakmp policy 5
  group 2
 crypto isakmp key cyber123 address 27.0.4.1
 ip access-list extended GRE-ACL
- permit gre host 30.30.30.1 host 30.30.30.2
+ permit gre host 27.0.2.1 host 27.0.4.1
 crypto ipsec transform-set TS esp-3des esp-md5-hmac
 crypto map cMAP 10 ipsec-isakmp 
  set peer 27.0.4.1
  set transform-set TS 
  match address GRE-ACL
 interface Serial0/0/0
- no ip nat outside
  crypto map cMAP
-ip access-list extended IN-NET
- deny ip 192.168.20.0 0.0.0.255 27.0.5.0 0.0.0.3
 ```
 - [ ISP ]
 ```bash
 interface Tunnel0
- ip address 30.30.30.1 255.255.255.252
- tunnel mode gre ip
+ ip address 30.30.30.2 255.255.255.252
+ mtu 1476
  tunnel source Serial0/0/1
  tunnel destination 27.0.2.1
-ip route 192.168.20.0 0.0.0.255 tunnel 0
-license boot module c2900 technology-package securityk9
+ip route 192.168.20.0 255.255.255.0 30.30.30.1
 crypto isakmp policy 5
  encr 3des
  hash md5
@@ -256,7 +256,7 @@ crypto isakmp policy 5
  group 2
 crypto isakmp key cyber123 address 27.0.2.1
 ip access-list extended GRE-ACL
- permit gre host 30.30.30.2 host 30.30.30.1
+ permit gre host 27.0.4.1 host 27.0.2.1
 crypto ipsec transform-set TS esp-3des esp-md5-hmac
 crypto map cMAP 10 ipsec-isakmp 
  set peer 27.0.2.1
