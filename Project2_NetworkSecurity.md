@@ -265,3 +265,53 @@ crypto map cMAP 10 ipsec-isakmp
 interface Serial0/0/1
  crypto map cMAP
 ```
+
+## 8. B-FW 설정 (ASA 5505 Firewall settings)
+### < *Configuration* >
+- [ B-FW ]
+```bash
+interface GigabitEthernet1/1
+ nameif OUTSIDE
+ security-level 100
+interface GigabitEthernet1/2
+ nameif INSIDE
+ security-level 0
+interface GigabitEthernet1/2
+ nameif INSIDE
+ security-level 0
+access-list OUTSIDE_IN extended permit icmp any any
+access-list OUTSIDE_IN extended permit udp any any eq domain
+access-list OUTSIDE_IN extended permit tcp any any eq www
+access-list OUTSIDE_IN extended deny ip any any
+access-group OUTSIDE_IN in interface OUTSIDE
+dhcpd dns 10.10.10.1
+dhcpd address 172.20.30.100-172.20.30.120 INSIDE
+dhcpd domain cyber.net interface INSIDE
+dhcpd enable INSIDE
+interface GigabitEthernet1/1
+ ospf cost 10
+router ospf 10
+ network 27.0.3.1 255.255.255.255 area 0
+```
+
+## 9. Radius 원격접속 설정 (Radius Remote access settings)
+### < *Configuration* >
+- [ B-RT ]
+```bash
+aaa new-model
+aaa authentication login default group radius local
+radius server RADIUS
+ address ipv4 27.0.5.1 auth-port 1645
+ key cyber123
+radius server 27.0.5.1
+ address ipv4 27.0.5.1 auth-port 1645
+ key cyber123
+ip ssh version 2
+ip domain-name cyber.net
+crypto key generate rsa general-keys modules 1024
+line vty 0 4
+ login authentication default
+ transport input ssh
+line con 0 4
+ login authentication default
+```
