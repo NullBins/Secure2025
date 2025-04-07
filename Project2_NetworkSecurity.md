@@ -23,7 +23,6 @@ ip dhcp excluded-address 192.168.10.1 192.168.10.127
 ip dhcp excluded-address 192.168.10.160 192.168.10.254
 ip dhcp excluded-address 192.168.20.1 192.168.20.99
 ip dhcp excluded-address 192.168.20.151 192.168.20.254
-!
 ip dhcp pool A1-POOL
  network 192.168.10.0 255.255.255.0
  default-router 192.168.10.254
@@ -207,12 +206,13 @@ ip access-list extended permit-rule
  permit tcp any host 27.0.7.1 eq www
  permit tcp any host 27.0.7.1 eq 443
  deny ip any any
- permit tcp any any eq www established
- permit udp any any eq domain
- permit icmp any any echo
- permit icmp any any echo-reply
+ip inspect name outbound http timeout 3600
+ip inspect name outbound icmp timeout 10
+ip inspect name outbound udp timeout 30
+ip inspect name outbound tcp timeout 3600
 interface GigabitEthernet0/1
  ip access-group permit-rule in
+ ip inspect outbound out
 ```
 
 ## 7. GRE over IPsec VPN 설정 (GRE-over-IPsec VPN configuration)
