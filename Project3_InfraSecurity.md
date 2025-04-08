@@ -410,6 +410,8 @@ vim /etc/ufw/before.rules
 >-A POSTROUTING -s 10.30.30.0/29 -o eth3 -j MASQUERADE
 >
 >COMMIT
+>
+>-A ufw-before-input -p icmp --icmp-type echo-request -j DROP
 >```
 ```vim
 ufw disable
@@ -428,7 +430,6 @@ ufw allow in on eth3 proto tcp to any port 80
 ufw allow in on eth3 proto tcp to any port 443
 ufw allow in on vlan.10 proto tcp to any port 20250
 ufw allow in proto udp to any port 67
-ufw allow in proto udp to any port 68
 ufw reload
 ufw status verbose
 ```
