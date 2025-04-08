@@ -591,11 +591,6 @@ systemctl restart apache2
 
 ## 7. FW SSH 설정 및 보안 강화 (FW SSH Configuration & Security Enhancements)
 ### < *Configuration* >
-- [ user01 ] - *SSH Keypair Keygens*
-```vim
-ssh-keygen -t rsa -b 4096 -C "fw.key"
-ssh-copy-id cyber@192.168.70.1
-```
 - [ fw ] - *SSH Service Security Configurations*
 ```vim
 vim /etc/ssh/sshd_config
@@ -604,12 +599,17 @@ vim /etc/ssh/sshd_config
 >Port 20250
 >PasswordAuthentication no
 >PubkeyAuthentication yes
->#PermitRootLogin yes
->Match Address 192.168.70.0/25
->  AllowUsers cyber
+>PermitRootLogin no
+>KbdInteractiveAuthentication no
+>ChallengeResponseAuthentication no
+>AllowUsers cyber@192.168.70.1
 >```
 ```vim
 systemctl restart ssh
+systemctl enable ssh
+ssh-keygen -t rsa
+cat ~/.ssh/id_rsa.pub >> ~/.ssh/authorized_keys
+ssh-copy-id -i ~/.ssh/id_rsa.pub -p 20250 cyber@192.168.70.1
 ```
 - [ user01 ] - *SSH Service Connection Script*
 ```vim
@@ -617,12 +617,15 @@ vim /home/cyber/fw.sh
 ```
 >```vim
 >#!/bin/bash
->ssh -p 20250 cyber@192.168.70.1
+>ssh -p 20250 cyber@192.168.70.1 -i /home/cyber/fw.key
 >```
 ```vim
 chown cyber:cyber /home/cyber/fw.sh
 chmod 700 /home/cyber/fw.sh
-./fw.sh
+mkdir -p ~/.ssh
+chmod 700 ~/.ssh
+ssh-keygen -t rsa -b 2048 -f fw.key
+ssh-copy-id -i fw.key.pub -p 20250 cyber@192.168.70.1
 ```
 
 ## 8. WWW SSH 보안 강화 스크립트 (WWW SSH Security Script)
